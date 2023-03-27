@@ -1,12 +1,11 @@
 import numpy as np
-from PIL import Image, ImageOps
+from PIL import Image
 
 
 def encode(img: Image):
-    img = ImageOps.exif_transpose(img)
-    data = np.asarray(img.convert("RGBA"))
+    img = img.convert("RGBA")
+    data = np.asarray(img)
     data = np.swapaxes(data, 0, 1)
-    print(data.shape)
     width, height, dims = data.shape
     assert dims == 4  # RGBA
     return rgba_to_thumb_hash(width, height, data)
@@ -57,7 +56,6 @@ def rgba_to_thumb_hash(w: int, h: int, data: np.ndarray):
     alpha = data[..., 3] / 255
     alpha_sum = alpha.sum()
     data_with_alpha = data.copy().astype(np.float64)
-    print(data_with_alpha[..., 0].shape)
     data_with_alpha[..., 0] *= alpha
     data_with_alpha[..., 1] *= alpha
     data_with_alpha[..., 2] *= alpha
@@ -68,7 +66,6 @@ def rgba_to_thumb_hash(w: int, h: int, data: np.ndarray):
         avg[1] /= alpha_sum
         avg[2] /= alpha_sum
 
-    print(avg)
     has_alpha = alpha_sum < numpix
     l_limit = 5 if has_alpha else 7
     lx = max(1, round(l_limit * w / max(w, h)))
@@ -83,9 +80,7 @@ def rgba_to_thumb_hash(w: int, h: int, data: np.ndarray):
     p = (r + g) / 2 - b
     q = r - g
 
-    print(lx, ly)
     l_dc, l_ac, l_scale = encode_channel(l, max(3, lx), max(3, ly), w, h)
-    print(l_dc, l_scale)
     p_dc, p_ac, p_scale = encode_channel(p, 3, 3, w, h)
     q_dc, q_ac, q_scale = encode_channel(q, 3, 3, w, h)
     isLandscape = w > h
@@ -114,26 +109,11 @@ def rgba_to_thumb_hash(w: int, h: int, data: np.ndarray):
     return hash
 
 
-def hexprint(arr):
+def hexstring(arr):
+    out = []
     for i in arr:
         text = hex(i)[2:].upper()
         if len(text) < 2:
             text = "0" + text
-        print(text, end=" ")
-    print()
-
-
-if __name__ == '__main__':
-    target = np.array(
-        [96, 154, 134, 61, 12, 59, 176, 89, 108, 150, 168, 69, 105, 244, 132, 249, 14, 168, 39, 88, 118, 136, 112, 118,
-         71]
-        ,
-        dtype=np.uint8)
-    with open("sunrise.jpg", "rb") as f:
-        img = Image.open(f)
-        result = encode(img)
-        print(result)
-        print(target.tolist())
-        # hexprint(target)
-        hexprint(result)
-        print("60 9A 86 3D 0C 3B B0 59 6D 96 A8 45 69 F4 84 F9 0E A8 27 58 76 88 70 76 47")
+        out.append(text)
+    return " ".join(out)
