@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "thumbhash-python"
 version = "0.1.0"
-description = "An experimental port of thumbhash to Python"
+description = "An experimental port of ThumbHash to Python"
 authors = ["Lukas Winkler <git@lw1.at>"]
 readme = "README.md"
 

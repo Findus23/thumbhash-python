@@ -2,7 +2,7 @@
 
 A very quick Python port of [Evan Wallace's](https://github.com/evanw) [ThumbHash](https://github.com/evanw/thumbhash).
 
-For now only supports encoding images.
+For now only supports encoding images. Gives identical or near-identical results for all original test images.
 
 ## Disclaimer
 
