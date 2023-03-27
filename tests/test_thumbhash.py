@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import pytest
 from PIL import Image, ImageOps
 
-from thumbhash_python import encode, hexstring
+from thumbhash_python import ThumbhashEncoder
 
 this_dir = Path(__file__).parent
 file_dir = this_dir / "files"
@@ -15,10 +15,11 @@ file_dir = this_dir / "files"
 class Expected:
     hex: str
     array: List[int]
+    base64: Optional[str] = None
 
 
 reference = [
-    # hex are from website/JavaScript, array from rust
+    # hex/base64 are from website/JavaScript, array from rust
     ("firefox.png", Expected(
         # Website has 6D instead of 6C
         hex="60 9A 86 3D 0C 3B B0 59 6C 96 A8 45 69 F4 84 F9 0E A8 27 58 76 88 70 76 47",
@@ -27,6 +28,7 @@ reference = [
     )),
     ("sunrise.jpg", Expected(
         hex="D5 07 12 1D 04 67 87 8F 77 57 87 48 87 87 97 87 58 78 90 95 08",
+        base64="1QcSHQRnh493V4dIh4eXh1h4kJUI",
         array=[213, 7, 18, 29, 132, 95, 116, 137, 120, 136, 135, 118, 136, 135, 120, 120, 8, 135, 149, 96, 87]
     )),
     ("flower.jpg", Expected(
@@ -64,6 +66,7 @@ reference = [
     )),
     ("sunset.jpg", Expected(
         hex="DC F7 0D 35 84 85 79 78 7F 77 77 A5 77 48 87 66 86 60 57 08 76",
+        base64="3PcNNYSFeXh/d3eld0iHZoZgVwh2",
         array=[220, 247, 13, 53, 132, 133, 121, 120, 127, 119, 119, 165, 119, 72, 135, 102, 134, 96, 87, 8, 118]
     )),
 ]
@@ -75,8 +78,8 @@ def test_flower(filename, expected):
         img = Image.open(f)
         img_rotated = ImageOps.exif_transpose(img)
 
-    result_rotated = encode(img_rotated)
-    result_unrotated = encode(img)
-    assert hexstring(result_rotated) == expected.hex
+    result_rotated = ThumbhashEncoder(img_rotated)
+    result_unrotated = ThumbhashEncoder(img)
+    assert result_rotated.to_hexstring() == expected.hex
     # Rust version doesn't rotate images according to EXIF
-    assert result_unrotated == expected.array
+    assert result_unrotated.hash == expected.array

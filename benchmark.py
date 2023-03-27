@@ -2,7 +2,7 @@ import time
 
 from PIL import Image, ImageOps
 
-from thumbhash_python import encode
+from thumbhash_python import ThumbhashEncoder
 
 
 def bench(repeats=100):
@@ -12,7 +12,7 @@ def bench(repeats=100):
 
     start = time.perf_counter_ns()
     for _ in range(repeats):
-        a = encode(img)
+        a = ThumbhashEncoder(img)
     end = time.perf_counter_ns()
     print((end - start) / 1_000_000 / repeats, "ms")
 
