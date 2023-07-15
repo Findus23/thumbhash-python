@@ -6,9 +6,9 @@ authors = ["Lukas Winkler <git@lw1.at>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
-pillow = "^9.4.0"
-numpy = "^1.24.2"
+python = "^3.9"
+pillow = "^10.0.0"
+numpy = "^1.25.1"
 
 
 [tool.poetry.group.dev.dependencies]
